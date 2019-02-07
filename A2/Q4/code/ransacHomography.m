@@ -1,7 +1,23 @@
 function [ H ] = ransacHomography( x1, x2, thresh )
-%RANSACHOMOGRAPHY Summary of this function goes here
-%   Detailed explanation goes here
+    k = 4;
+    n = size(x1,1);
+    max_iter = 2000;
+    
+    best_nc = 0;
+    best_C = [];
+    
+    for i=1:max_iter
+        fp = randperm(n,k);
+        H = homography(x1(fp,:), x2(fp,:));
 
-
+        err = sre(H,x1,x2);
+        C = find(err<=thresh);
+        if size(C,1) > best_nc
+            best_nc = size(C,1);
+            best_C = C;
+        end
+    end
+        
+    H = homography(x1(best_C,:), x2(best_C,:));    
 end
 
