@@ -1,23 +1,22 @@
 import torch
+from Layer import Layer
 
 
-class Linear():
+class Linear(Layer):
     def __init__(self, in_features, out_features):
+        super(Linear, self).__init__()
         self.W = torch.rand(out_features, in_features)
         self.B = torch.rand(out_features, 1)
 
         self.gradW = torch.zeros(self.W.shape)
         self.gradB = torch.zeros(self.B.shape)
 
-        self.output = torch.Tensor()
-        self.gradInput = torch.Tensor()
-
     def forward(self, input):
-        self.output = input*self.W.T
+        self.output = input.mm(self.W.t())
         return self.output
 
     def backward(self, input, gradOutput):
-        self.gradInput = gradOutput*self.W
-        self.gradW = gradOutput.T*input
+        self.gradInput = gradOutput.mm(self.W)
+        self.gradW = gradOutput.t().mm(input)
         self.gradB = gradOutput.sum(dim=1)
         return self.gradInput

@@ -3,6 +3,8 @@
 **/*.*~
 **/*.z*
 **/*.ipy*
+**/__py*
+**/test.py
 ### Lua ###
 # Compiled Lua sources
 luac.out
