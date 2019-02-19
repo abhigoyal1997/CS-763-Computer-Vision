@@ -1,13 +1,11 @@
-local class = require "class"
-
-local Linear = class('Linear')
+local Linear = torch.class('Linear')
 
 function Linear:__init(in_features, out_features)
-    self.W = torch.Tensor(out_features, in_features)
-    self.B = torch.Tensor(out_features, 1)
+    self.W = torch.rand(out_features, in_features)
+    self.B = torch.rand(out_features, 1)
 
-    self.gradW = torch.Tensor(self.W:size())
-    self.gradB = torch.Tensor(self.B:size())
+    self.gradW = torch.zeros(self.W:size())
+    self.gradB = torch.zeros(self.B:size())
 end
 
 function Linear:forward(input)
@@ -27,4 +25,9 @@ end
 function Linear:clearGradParam()
     self.gradW:fill(0)
     self.gradB:fill(0)
+    if self.gradInput ~= nil then
+        self.gradInput:fill(0)
+    end
 end
+
+return Linear
