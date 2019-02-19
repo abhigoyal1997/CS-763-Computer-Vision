@@ -13,6 +13,7 @@ class Linear(Layer):
 
     def forward(self, input):
         self.output = input.mm(self.W.t())
+        self.output = self.output + self.B.t().repeat(input.size()[0], 1)
         return self.output
 
     def backward(self, input, gradOutput):
@@ -22,5 +23,6 @@ class Linear(Layer):
         return self.gradInput
 
     def clearGradParam(self):
+        super(Linear, self).clearGradParam()
         self.gradW[:] = 0
         self.gradB[:] = 0
