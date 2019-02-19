@@ -20,3 +20,7 @@ class Linear(Layer):
         self.gradW = gradOutput.t().mm(input)
         self.gradB = gradOutput.sum(dim=1)
         return self.gradInput
+
+    def clearGradParam(self):
+        self.gradW[:] = 0
+        self.gradB[:] = 0
