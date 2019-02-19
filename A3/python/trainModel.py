@@ -1,14 +1,11 @@
 import argparse
 import os
+import numpy as np
 import torchfile
-from Model import Model
-from Linear import Linear
-from ReLU import ReLU
-
-# Handle the flags
-# Create Model directory
-# Input training data -> useful to create generic code that can be used to input testing data as well
-# train
+from src.Model import Model
+from src.Linear import Linear
+from src.ReLU import ReLU
+from src.Dropout import Dropout
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,7 +17,18 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    
+    # Something to this effect - to create the directory
     if not os.path.exists(args.modelName):
         os.makedirs(args.modelName)
     
+    images = torchfile.load(args.data)
+    labels = torchfile.load(args.target)
+
+    curr_shape = np.shape(images)
+    images = np.reshape(images, (curr_shape[0],-1)) # reshape to (#instances, -1)
+
+    images = images.astype(np.float32) # cast to float
+    images = images/255.0 # scale to [0,1]
+
     
