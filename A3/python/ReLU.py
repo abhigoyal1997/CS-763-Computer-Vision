@@ -2,6 +2,9 @@ from Layer import Layer
 
 
 class ReLU(Layer):
+    def __repr__(self):
+        return 'ReLU'
+
     def forward(self, input):
         self.output = input.clone()
         self.output[input<0] = 0

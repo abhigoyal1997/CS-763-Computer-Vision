@@ -5,6 +5,9 @@ class Model():
     def __call__(self, input):
         return self.forward(input)
 
+    def __repr__(self):
+        return 'Model-{}'.format(self.layers)
+
     def forward(self, input):
         output = input
         for layer in self.layers:
