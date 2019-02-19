@@ -2,10 +2,13 @@ import argparse
 import os
 import numpy as np
 import torchfile
+
 from src.Model import Model
 from src.Linear import Linear
 from src.ReLU import ReLU
 from src.Dropout import Dropout
+
+from checkModel import getModel
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -14,6 +17,18 @@ def parse_args():
     parser.add_argument('-data', help='Path to training instances.', default=os.path.join(data_dir, 'data.bin'))
     parser.add_argument('-target', help='Path to training labels.', default=os.path.join(data_dir, 'labels.bin'))
     return parser.parse_args()
+
+def train(model, images, labels):
+    batch_size = 
+    learning_rate = 
+
+    # sample batch_size from np.shape(images)[0]
+    # make batch from images and labels
+
+    # model.forward()
+    # model.backward()
+
+    # vars update using gradient descent
 
 if __name__ == '__main__':
     args = parse_args()
@@ -31,4 +46,6 @@ if __name__ == '__main__':
     images = images.astype(np.float32) # cast to float
     images = images/255.0 # scale to [0,1]
 
+    model = getModel(config_file) # need to specify this somehow
     
+    train(model, images, labels)
