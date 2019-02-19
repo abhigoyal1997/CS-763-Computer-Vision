@@ -5,7 +5,7 @@ from src.Model import Model
 from src.Linear import Linear
 from src.ReLU import ReLU
 from src.Dropout import Dropout
-torch.set_printoptions(precision=10)
+torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 def getModel(config_file):
@@ -47,7 +47,7 @@ def main(args):
     model.backward(input, gradients)
     gradients = model.getGradients()
 
-    torch.save(output, args.o)
+    torch.save(output.numpy(), args.o)
     torch.save(gradients['gradW'], args.ow)
     torch.save(gradients['gradB'], args.ob)
     torch.save(gradients['gradInput'], args.ig)

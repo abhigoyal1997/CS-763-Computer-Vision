@@ -32,5 +32,5 @@ class Model():
             gradients[x] = []
             for layer in self.layers:
                 if hasattr(layer, x):
-                    gradients[x].append(eval('layer.'+x))
+                    gradients[x].append(eval('layer.'+x).numpy())
         return gradients
