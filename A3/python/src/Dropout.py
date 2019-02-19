@@ -19,5 +19,5 @@ class Dropout(Layer):
         return self.output
 
     def backward(self, input, gradOutput):
-        self.gradInput = gradOutput.mm(self.mask)
+        self.gradInput = gradOutput*self.mask
         return self.gradInput
