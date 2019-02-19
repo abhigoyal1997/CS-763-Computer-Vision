@@ -13,7 +13,7 @@ class Dropout(Layer):
     def forward(self, input):
         prob_tensor = torch.Tensor(1,input.size(1))
         prob_tensor[:] = self.prob_keep
-        self.mask = torch.bernoulli(prob_tensor).expand_as(input)  # self.mask is of size : layer_dim x layer_dim
+        self.mask = torch.bernoulli(prob_tensor).expand_as(input)
 
         self.output = input*self.mask
         return self.output
