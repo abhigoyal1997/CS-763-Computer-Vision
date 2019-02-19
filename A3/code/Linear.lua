@@ -16,7 +16,7 @@ end
 
 function Linear:backward(input, gradOutput)
     self.gradInput = gradOutput*self.W
-    self.gradW = input*gradOutput:t()
+    self.gradW = gradOutput:t()*input
     self.gradB = gradOutput:sum(2)
 
     return self.gradInput
