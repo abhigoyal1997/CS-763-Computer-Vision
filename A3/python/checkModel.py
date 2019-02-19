@@ -5,6 +5,7 @@ import torch
 from Model import Model
 from Linear import Linear
 from ReLU import ReLU
+from Dropout import Dropout
 
 
 def getModel(config_file):
