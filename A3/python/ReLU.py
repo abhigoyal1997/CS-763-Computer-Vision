@@ -1,4 +1,3 @@
-import torch
 from Layer import Layer
 
 
