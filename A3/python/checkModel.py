@@ -1,11 +1,11 @@
 import argparse
-import os
 import torchfile
 import torch
 from src.Model import Model
 from src.Linear import Linear
 from src.ReLU import ReLU
 from src.Dropout import Dropout
+torch.set_printoptions(precision=10)
 
 
 def getModel(config_file):
@@ -55,15 +55,13 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    base_dir = '../CS 763 Deep Learning HW'
-    output_dir = '../outputs'
-    parser.add_argument('-config', help='Path to the model configuration file.', default=os.path.join(base_dir, 'modelConfig_2.txt'))
-    parser.add_argument('-i', help='Inputs to the model.', default=os.path.join(base_dir, 'input_sample_2.bin'))
-    parser.add_argument('-go', help='Gradients of the outputs.', default=os.path.join(base_dir, 'gradOutput_sample_2.bin'))
-    parser.add_argument('-o', help='Path to save the outputs.', default=os.path.join(output_dir, 'output_2.bin'))
-    parser.add_argument('-ow', help='Gradients w.r.t. model weights.', default=os.path.join(output_dir, 'gradw_2.bin'))
-    parser.add_argument('-ob', help='Gradients w.r.t. model biases.', default=os.path.join(output_dir, 'gradb_2.bin'))
-    parser.add_argument('-ig', help='Gradients w.r.t. inputs.', default=os.path.join(output_dir, 'gradi_2.bin'))
+    parser.add_argument('-config', help='Path to the model configuration file.', required=True)
+    parser.add_argument('-i', help='Inputs to the model.', required=True)
+    parser.add_argument('-go', help='Gradients of the outputs.', required=True)
+    parser.add_argument('-o', help='Path to save the outputs.', required=True)
+    parser.add_argument('-ow', help='Gradients w.r.t. model weights.', required=True)
+    parser.add_argument('-ob', help='Gradients w.r.t. model biases.', required=True)
+    parser.add_argument('-ig', help='Gradients w.r.t. inputs.', required=True)
     return parser.parse_args()
 
 
