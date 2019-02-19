@@ -5,6 +5,9 @@ class Layer():
     def __call__(self, input):
         return self.forward(input)
 
+    def __repr__(self):
+        return 'Generic Layer'
+
     def forward(self, input):
         pass
 

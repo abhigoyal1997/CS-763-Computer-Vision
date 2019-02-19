@@ -11,6 +11,9 @@ class Linear(Layer):
         self.gradW = torch.zeros(self.W.shape)
         self.gradB = torch.zeros(self.B.shape)
 
+    def __repr__(self):
+        return 'Linear-{}'.format(tuple(self.W.t().shape))
+
     def forward(self, input):
         self.output = input.mm(self.W.t())
         return self.output
@@ -22,5 +25,6 @@ class Linear(Layer):
         return self.gradInput
 
     def clearGradParam(self):
+        super(Linear, self).clearGradParam()
         self.gradW[:] = 0
         self.gradB[:] = 0
