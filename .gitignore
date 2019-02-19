@@ -2,6 +2,7 @@
 **/Submission*
 **/*.*~
 **/*.z*
+**/*.ipy*
 ### Lua ###
 # Compiled Lua sources
 luac.out
