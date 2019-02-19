@@ -23,6 +23,8 @@ def getModel(config_file):
             il += 1
         elif desc[0] == 'relu':
             layer = ReLU()
+        elif desc[0] == 'dropout':
+            layer = Dropout(desc[1])
         else:
             print(desc[0] + ' layer not implemented!')
         model.addLayer(layer)
