@@ -1,5 +1,5 @@
 import torch
-from Layer import Layer
+from src.Layer import Layer
 
 
 class Linear(Layer):
@@ -16,7 +16,7 @@ class Linear(Layer):
 
     def forward(self, input):
         self.output = input.mm(self.W.t())
-        self.output = self.output + self.B.t().repeat(input.size()[0], 1)
+        self.output = self.output + self.B.t().expand_as(self.output)
         return self.output
 
     def backward(self, input, gradOutput):

@@ -2,10 +2,10 @@ import argparse
 import os
 import torchfile
 import torch
-from Model import Model
-from Linear import Linear
-from ReLU import ReLU
-from Dropout import Dropout
+from src.Model import Model
+from src.Linear import Linear
+from src.ReLU import ReLU
+from src.Dropout import Dropout
 
 
 def getModel(config_file):
@@ -19,9 +19,10 @@ def getModel(config_file):
     for desc in config[1:-2]:
         desc = desc.split()
         if desc[0] == 'linear':
-            layer = Linear(int(desc[1]), int(desc[2]))
+            in_features, out_features = int(desc[1]), int(desc[2])
+            layer = Linear(in_features, out_features)
             layer.W = torch.Tensor(weights[il])
-            layer.B = torch.Tensor(biases[il])
+            layer.B = torch.Tensor(biases[il]).view(out_features, 1)
             il += 1
         elif desc[0] == 'relu':
             layer = ReLU()

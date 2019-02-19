@@ -1,12 +1,12 @@
 import torch
-from Layer import Layer
+from src.Layer import Layer
 
 
 class Dropout(Layer):
     def __init__(self, prob_keep):
         super(Dropout, self).__init__()
         self.prob_keep = prob_keep
-    
+
     def __repr__(self):
         return 'Dropout-{}'.format(self.prob_keep)
 
