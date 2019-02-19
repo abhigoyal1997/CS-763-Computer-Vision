@@ -1,6 +1,7 @@
 import argparse
 import os
 import torchfile
+import torch
 from Model import Model
 from Linear import Linear
 from ReLU import ReLU
@@ -18,8 +19,8 @@ def getModel(config_file):
         desc = desc.split()
         if desc[0] == 'linear':
             layer = Linear(int(desc[1]), int(desc[2]))
-            layer.W = weights[il]
-            layer.B = biases[il]
+            layer.W = torch.Tensor(weights[il])
+            layer.B = torch.Tensor(biases[il])
             il += 1
         elif desc[0] == 'relu':
             layer = ReLU()
@@ -32,7 +33,20 @@ def getModel(config_file):
 
 def main(args):
     model = getModel(args.config)
-    print(model)
+    input = torch.Tensor(torchfile.load(args.i))
+    batch_size = input.size(0)
+    input = input.view(batch_size, -1)
+    gradients = torch.Tensor(torchfile.load(args.go))
+
+    output = model(input)
+    model.clearGradParam()
+    model.backward(input, gradients)
+    gradients = model.getGradients()
+
+    torch.save(output, args.o)
+    torch.save(gradients['gradW'], args.ow)
+    torch.save(gradients['gradB'], args.ob)
+    torch.save(gradients['gradInput'], args.ig)
 
 
 def parse_args():
