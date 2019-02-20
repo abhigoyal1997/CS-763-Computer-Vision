@@ -50,7 +50,7 @@ def readHparams(spec_file):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    data_dir = '../../../A3_data'
+    data_dir = '../Train'
     parser.add_argument('-modelName', help='Will create a folder with given model name and save the trained model in that folder.', required=True)
     parser.add_argument('-modelSpec', help='Path to Model Specification file.', default='./bestModel/model_spec.txt')
     parser.add_argument('-trainSpec', help='Path to Training Hyperparam file.', default='./bestModel/train_spec.txt')
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     print('Model initialized!')
 
     print('Loading data...')
-    train_size = 100
+    train_size = 5000
 
     # Model created, Start loading training data
     images = torch.Tensor(torchfile.load(args.data))[:train_size]

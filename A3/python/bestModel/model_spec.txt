@@ -2,4 +2,6 @@ linear 11664 2000
 relu
 linear 2000 500
 relu
-linear 500 6
+linear 500 100
+relu
+linear 100 6

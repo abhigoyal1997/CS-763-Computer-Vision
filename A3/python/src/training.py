@@ -56,8 +56,7 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
             predictions = torch.cat([predictions, torch.argmax(logits,dim=1)])
             y_true = torch.cat([y_true, y])
 
-        print(i, log_interval)
-        if (log_interval is not None) and (i % log_interval == 0):
+        if mode == 'train' and (log_interval is not None) and (i % log_interval == 0):
             writer.add_scalar('{}_loss'.format(mode), batch_loss.item(), epoch*len(batches)+i)
         i += 1
 
@@ -65,6 +64,8 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
     accuracy = (predictions == y_true.long()).double().mean().item()
     if writer is not None:
         writer.add_scalar('{}_acc'.format(mode), accuracy, epoch)
+        if mode == 'valid':
+            writer.add_scalar('{}_loss'.format(mode), loss, epoch)
     return {'loss': loss, 'acc': accuracy}
 
 
