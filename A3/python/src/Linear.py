@@ -22,7 +22,7 @@ class Linear(Layer):
     def backward(self, input, gradOutput):
         self.gradInput = gradOutput.mm(self.W)
         self.gradW = gradOutput.t().mm(input)
-        self.gradB = gradOutput.sum(dim=0)
+        self.gradB = gradOutput.sum(dim=0, keepdim=True).t()
         return self.gradInput
 
     def clearGradParam(self):
