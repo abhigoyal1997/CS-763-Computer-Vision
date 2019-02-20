@@ -74,7 +74,8 @@ def train(model, hparams, instances, labels):
             # Store things
             loss_list.append(loss.numpy())
             predictions = torch.argmax(logits,dim=1).numpy()
-            acc_list.append(np.sum(predictions == y))
+            accuracy = torch.mean(np.equal(predictions,y).double())
+            acc_list.append(accuracy)
         avg_loss = np.mean(np.array(loss_list))
         avg_acc = np.mean(np.array(acc_list))
         if verbose:
