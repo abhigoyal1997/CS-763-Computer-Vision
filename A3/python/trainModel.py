@@ -2,6 +2,7 @@ import argparse
 import os
 import torchfile
 import torch
+import numpy as np
 
 from src.Model import Model
 from src.Linear import Linear
@@ -10,6 +11,7 @@ from src.Dropout import Dropout
 
 from src.training import train
 torch.set_default_tensor_type(torch.DoubleTensor)  # As asked in assignment to use double tensor
+RANDOM_SEED = 12345
 
 
 def createModel(spec_file):
@@ -42,12 +44,13 @@ def readHparams(spec_file):
     hparams['num_epochs'] = int(spec[2])
     hparams['momentum'] = float(spec[3])
     hparams['verbose'] = int(spec[4])
+    hparams['train_ratio'] = float(spec[5])
     return hparams
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    data_dir = '../../../A3_data'
+    data_dir = '../Train'
     parser.add_argument('-modelName', help='Will create a folder with given model name and save the trained model in that folder.', required=True)
     parser.add_argument('-modelSpec', help='Path to Model Specification file.', default='./bestModel/model_spec.txt')
     parser.add_argument('-trainSpec', help='Path to Training Hyperparam file.', default='./bestModel/train_spec.txt')
@@ -57,6 +60,9 @@ def parse_args():
 
 
 if __name__ == '__main__':
+    torch.manual_seed(RANDOM_SEED)
+    np.random.seed(RANDOM_SEED)
+
     args = parse_args()
 
     # To create the directory
@@ -68,7 +74,9 @@ if __name__ == '__main__':
     model, model_config = createModel(args.modelSpec)
     # Create Hparams
     hparams = readHparams(args.trainSpec)
+    print('Model initialized!')
 
+    print('Loading data...')
     # Model created, Start loading training data
     images = torch.Tensor(torchfile.load(args.data))
     labels = torch.Tensor(torchfile.load(args.target))
@@ -76,12 +84,5 @@ if __name__ == '__main__':
     # Reshape to (#instances, -1) and Scale to [0,1]
     images = images.view(images.size(0), -1)/255.0
 
-    train(model, hparams, images, labels)
-    weights, biases = model.getParams()
-    torch.save(weights, os.path.join(model_path, 'weights.bin'))
-    torch.save(biases, os.path.join(model_path, 'biases.bin'))
-    with open(os.path.join(model_path, 'config.txt'), 'w') as f:
-        f.write(str(model_config[1]) + '\n')
-        f.writelines(model_config[0])
-        f.write(os.path.join(model_path, 'weights.bin')+'\n')
-        f.write(os.path.join(model_path, 'biases.bin')+'\n')
+    print('Training model...')
+    train(model, hparams, images, labels, model_path, model_config)
