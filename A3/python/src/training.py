@@ -108,7 +108,7 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch):
             predictions = torch.cat([predictions, torch.argmax(logits,dim=1)])
             y_true = torch.cat([y_true, y])
     loss = np.mean(loss)
-    accuracy = (predictions == y_true).sum().item()
+    accuracy = (predictions == y_true).mean().item()
     return {'loss': loss, 'acc': accuracy}
 
 
