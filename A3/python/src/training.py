@@ -73,7 +73,7 @@ def train(model, hparams, instances, labels, model_path, model_config):
     train_batches = BatchLoader(train_idx, batch_size, instances, labels, True)
     valid_batches = BatchLoader(valid_idx, batch_size, instances, labels)
 
-    best_loss = float('inf')
+    best_acc = 0.0
     for epoch in range(num_epochs):
         # Train
         metrics = run_epoch('train', model, criterion, optimizer, train_batches, epoch)
@@ -85,6 +85,6 @@ def train(model, hparams, instances, labels, model_path, model_config):
         if verbose:
             print('Validation: {}'.format(metrics))
 
-        if metrics['loss'] < best_loss:
-            best_loss = metrics['loss']
+        if metrics['acc'] > best_acc:
+            best_acc = metrics['acc']
             save_model(model, model_path, model_config)

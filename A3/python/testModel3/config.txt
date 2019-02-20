@@ -1,0 +1,7 @@
+2
+linear 11664 1000
+dropout 0.5
+relu
+linear 1000 6
+./testModel3/weights.bin
+./testModel3/biases.bin
