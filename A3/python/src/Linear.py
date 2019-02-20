@@ -1,11 +1,12 @@
 import torch
+import math
 from src.Layer import Layer
 
 
 class Linear(Layer):
     def __init__(self, in_features, out_features):
         super(Linear, self).__init__()
-        self.W = torch.randn(out_features, in_features)*0.1
+        self.W = torch.randn(out_features, in_features)*math.sqrt(2.0/in_features)
         self.B = torch.zeros(out_features, 1)
 
         self.gradW = torch.zeros(self.W.shape)
