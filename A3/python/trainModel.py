@@ -62,6 +62,7 @@ def parse_args():
     parser.add_argument('-data', help='Path to training instances.', default=os.path.join(data_dir, 'data.bin'))
     parser.add_argument('-target', help='Path to training labels.', default=os.path.join(data_dir, 'labels.bin'))
     parser.add_argument('-s', dest='train_size', help='Train size', default=None, type=int)
+    parser.add_argument('--downsample', action='store_true', default=False)
     return parser.parse_args()
 
 
@@ -90,6 +91,10 @@ if __name__ == '__main__':
     else:
         images = torch.Tensor(torchfile.load(args.data))[:args.train_size]
         labels = torch.Tensor(torchfile.load(args.target))[:args.train_size]
+
+    if args.downsample:
+        downsample_idx = range(0,108,2)
+        images = images[:,downsample_idx,:][:,:,downsample_idx]
 
     # Reshape to (#instances, -1) and Scale to [0,1]
     images = images.view(images.size(0), -1)/255.0

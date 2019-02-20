@@ -1,6 +1,6 @@
-linear 11664 2000
+linear 2916 1000
 relu
-linear 2000 500
+linear 1000 500
 relu
 linear 500 100
 relu

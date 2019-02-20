@@ -43,6 +43,7 @@ def parse_args():
     data_dir = '../Test'
     parser.add_argument('-modelName', help='Will use this to load Model.')
     parser.add_argument('-data', help='Path to testing instances.', default=os.path.join(data_dir, 'test.bin'))
+    parser.add_argument('--downsample', action='store_true', default=False)
     return parser.parse_args()
 
 
@@ -63,6 +64,10 @@ if __name__ == '__main__':
     # Reshape to (#instances, -1) and Scale to [0,1]
     images = torch.Tensor(torchfile.load(args.data))
     images = images.view(images.size(0), -1)/255.0
+
+    if args.downsample:
+        downsample_idx = range(0,108,2)
+        images = images[:,downsample_idx,:][:,:,downsample_idx]
 
     print('Predicting labels...')
     predictions = test(model, images)
