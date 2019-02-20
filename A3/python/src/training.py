@@ -53,8 +53,8 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch):
         else:
             predictions = torch.cat([predictions, torch.argmax(logits,dim=1)])
             y_true = torch.cat([y_true, y])
-    loss = np.mean(loss)
-    accuracy = (predictions == y_true).mean(dim=0).item()
+    loss = loss/len(batches)
+    accuracy = (predictions == y_true.long()).double().mean().item()
     return {'loss': loss, 'acc': accuracy}
 
 

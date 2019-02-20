@@ -77,11 +77,11 @@ if __name__ == '__main__':
     print('Model initialized!')
 
     print('Loading data...')
-    train_size = 1000
+    # train_size = 500
 
     # Model created, Start loading training data
-    images = torch.Tensor(torchfile.load(args.data))[:train_size]
-    labels = torch.Tensor(torchfile.load(args.target))[:train_size]
+    images = torch.Tensor(torchfile.load(args.data))
+    labels = torch.Tensor(torchfile.load(args.target))
 
     # Reshape to (#instances, -1) and Scale to [0,1]
     images = images.view(images.size(0), -1)/255.0

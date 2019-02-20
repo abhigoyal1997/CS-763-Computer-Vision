@@ -1,5 +1,8 @@
+3
 linear 11664 5000
 relu
 linear 5000 1000
 relu
 linear 1000 6
+./test/weights.bin
+./test/biases.bin
