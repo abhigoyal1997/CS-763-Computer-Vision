@@ -50,7 +50,7 @@ def readHparams(spec_file):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    data_dir = '../Train'
+    data_dir = '../../../A3_data'
     parser.add_argument('-modelName', help='Will create a folder with given model name and save the trained model in that folder.', required=True)
     parser.add_argument('-modelSpec', help='Path to Model Specification file.', default='./bestModel/model_spec.txt')
     parser.add_argument('-trainSpec', help='Path to Training Hyperparam file.', default='./bestModel/train_spec.txt')

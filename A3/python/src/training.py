@@ -85,7 +85,7 @@ def train(model, hparams, instances, labels, model_path, model_config, log_inter
 
     writer = SummaryWriter(log_dir='logs/{}_{}'.format(model_path, time()))
 
-    best_loss = float('inf')
+    best_acc = 0.0
     for epoch in range(num_epochs):
         # Train
         metrics = run_epoch('train', model, criterion, optimizer, train_batches, epoch, writer, log_interval)
@@ -97,6 +97,6 @@ def train(model, hparams, instances, labels, model_path, model_config, log_inter
         if verbose:
             print('Validation: {}'.format(metrics))
 
-        if metrics['loss'] < best_loss:
-            best_loss = metrics['loss']
+        if metrics['acc'] > best_acc:
+            best_acc = metrics['acc']
             save_model(model, model_path, model_config)
