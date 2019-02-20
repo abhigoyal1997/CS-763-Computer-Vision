@@ -5,4 +5,3 @@ linear 5000 1000
 dropout 0.5
 relu
 linear 1000 6
-relu

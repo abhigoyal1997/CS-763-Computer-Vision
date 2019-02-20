@@ -1,6 +1,5 @@
 import argparse
 import os
-import numpy as np
 import torchfile
 import torch
 
@@ -10,17 +9,20 @@ from src.ReLU import ReLU
 from src.Dropout import Dropout
 
 from src.training import train
-# torch.set_default_tensor_type(torch.DoubleTensor)
+torch.set_default_tensor_type(torch.DoubleTensor)  # As asked in assignment to use double tensor
+
 
 def createModel(spec_file):
     with open(spec_file,'r') as f:
         spec = f.readlines()
     model = Model()
+    num_linear_layers = 0
     for desc in spec:
         desc = desc.split()
         if desc[0] == 'linear':
             in_features, out_features = int(desc[1]), int(desc[2])
             layer = Linear(in_features, out_features)
+            num_linear_layers += 1
         elif desc[0] == 'relu':
             layer = ReLU()
         elif desc[0] == 'dropout':
@@ -28,7 +30,8 @@ def createModel(spec_file):
         else:
             print(desc[0] + ' layer not implemented!')
         model.addLayer(layer)
-    return model
+    return model, (spec, num_linear_layers)
+
 
 def readHparams(spec_file):
     with open(spec_file,'r') as f:
@@ -41,38 +44,44 @@ def readHparams(spec_file):
     hparams['verbose'] = int(spec[4])
     return hparams
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    data_dir = '../../../A3_data'
-    parser.add_argument('-modelName', help='Will create a folder with given model name and save the trained model in that folder.')
+    data_dir = '../Train'
+    parser.add_argument('-modelName', help='Will create a folder with given model name and save the trained model in that folder.', required=True)
     parser.add_argument('-modelSpec', help='Path to Model Specification file.', default='./bestModel/model_spec.txt')
     parser.add_argument('-trainSpec', help='Path to Training Hyperparam file.', default='./bestModel/train_spec.txt')
     parser.add_argument('-data', help='Path to training instances.', default=os.path.join(data_dir, 'data.bin'))
     parser.add_argument('-target', help='Path to training labels.', default=os.path.join(data_dir, 'labels.bin'))
     return parser.parse_args()
 
+
 if __name__ == '__main__':
     args = parse_args()
-    
+
     # To create the directory
-    modelPath = os.path.join('./', args.modelName)
-    if not os.path.exists(modelPath):
-        os.makedirs(modelPath)
-    
+    model_path = os.path.join('./', args.modelName)
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+
     # Create Model
-    model = createModel(args.modelSpec)
+    model, model_config = createModel(args.modelSpec)
     # Create Hparams
     hparams = readHparams(args.trainSpec)
 
     # Model created, Start loading training data
-    images = torchfile.load(args.data)
-    labels = torchfile.load(args.target)
+    images = torch.Tensor(torchfile.load(args.data))
+    labels = torch.Tensor(torchfile.load(args.target))
 
-    # Reshape to (#instances, -1)
-    images = np.reshape(images, (images.shape[0],-1))
-    # Scale to [0,1]
-    images = images.astype(np.float32)/255.0
-    
+    # Reshape to (#instances, -1) and Scale to [0,1]
+    images = images.view(images.size(0), -1)/255.0
+
     train(model, hparams, images, labels)
-    # TODO : write the weights of the trained model to the modelName dir
-    # TODO : create a file config.txt according to relevant conventions
+    weights, biases = model.getParams()
+    torch.save(weights, os.path.join(model_path, 'weights.bin'))
+    torch.save(biases, os.path.join(model_path, 'biases.bin'))
+    with open(os.path.join(model_path, 'config.txt'), 'w') as f:
+        f.write(str(model_config[1]) + '\n')
+        f.writelines(model_config[0])
+        f.write(os.path.join(model_path, 'weights.bin')+'\n')
+        f.write(os.path.join(model_path, 'biases.bin')+'\n')

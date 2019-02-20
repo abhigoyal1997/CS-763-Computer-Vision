@@ -34,3 +34,12 @@ class Model():
                 if hasattr(layer, x):
                     gradients[x].append(eval('layer.'+x).numpy())
         return gradients
+
+    def getParams(self):
+        params = {}
+        for x in ['W', 'B']:
+            params[x] = []
+            for layer in self.layers:
+                if hasattr(layer, x):
+                    params[x].append(eval('layer.'+x).numpy())
+        return params
