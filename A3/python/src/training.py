@@ -11,7 +11,10 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 def save_model(model, model_path, model_config):
-    weights, biases = model.getParams()
+    params = model.getParams()
+    weights = params['W']
+    biases = params['B']
+
     torch.save(weights, os.path.join(model_path, 'weights.bin'))
     torch.save(biases, os.path.join(model_path, 'biases.bin'))
     with open(os.path.join(model_path, 'config.txt'), 'w') as f:
