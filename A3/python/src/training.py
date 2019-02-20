@@ -19,7 +19,7 @@ class Optimizer:
             if isinstance(layer, Linear):
                 self.step[layer_index] = (torch.zeros(layer.W.shape), torch.zeros(layer.B.shape))
 
-    def step(self):
+    def updateStep(self):
         for layer_index in range(self.num_layers):
             layer = self.model.layers[layer_index]
             if isinstance(layer, Linear):
@@ -69,7 +69,7 @@ def train(model, hparams, instances, labels):
             model.backward(x, gradient)
 
             # Weights update
-            optimizer.step()
+            optimizer.updateStep()
 
             # Store things
             loss_list.append(loss.numpy())

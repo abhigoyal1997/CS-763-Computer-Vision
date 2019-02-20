@@ -22,9 +22,9 @@ def test(model, instances):
         
         # Forward and Backward Pass
         instances_tensor = torch.tensor(instances_batch)
-        output = model.forward(instances_tensor)
-        predictions = torch.argmax(output, dim=1)
-        predicted_labels += output.numpy().tolist()
+        logits = model.forward(instances_tensor)
+        predictions = torch.argmax(logits, dim=1)
+        predicted_labels += predictions.numpy().tolist()
     
     return np.array(predicted_labels)
 

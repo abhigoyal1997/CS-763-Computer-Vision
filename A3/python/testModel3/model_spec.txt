@@ -1,0 +1,4 @@
+linear 11664 1000
+dropout 0.5
+relu
+linear 1000 6
