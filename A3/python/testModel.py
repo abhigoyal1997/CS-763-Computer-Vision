@@ -61,13 +61,13 @@ if __name__ == '__main__':
     # Model created, Start loading testing data
     images = torchfile.load(args.data)
 
-    # Reshape to (#instances, -1) and Scale to [0,1]
-    images = torch.Tensor(torchfile.load(args.data))
-    images = images.view(images.size(0), -1)/255.0
-
     if args.downsample:
         downsample_idx = range(0,108,2)
         images = images[:,downsample_idx,:][:,:,downsample_idx]
+
+    # Reshape to (#instances, -1) and Scale to [0,1]
+    images = torch.Tensor(torchfile.load(args.data))
+    images = images.view(images.size(0), -1)/255.0
 
     print('Predicting labels...')
     predictions = test(model, images)
