@@ -4,4 +4,7 @@ linear 2000 500
 relu
 linear 500 100
 relu
-linear 100 6
+linear 100 50
+relu
+dropout 0.5
+linear 50 6

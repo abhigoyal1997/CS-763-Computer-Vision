@@ -38,13 +38,18 @@ def createModel(spec_file):
 def readHparams(spec_file):
     with open(spec_file,'r') as f:
         spec = f.readlines()
+    param_keys = [
+        'batch_size',
+        'learning_rate',
+        'learning_rate_decay',
+        'num_epochs',
+        'momentum',
+        'verbose',
+        'train_ratio'
+    ]
     hparams = {}
-    hparams['batch_size'] = int(spec[0])
-    hparams['learning_rate'] = float(spec[1])
-    hparams['num_epochs'] = int(spec[2])
-    hparams['momentum'] = float(spec[3])
-    hparams['verbose'] = int(spec[4])
-    hparams['train_ratio'] = float(spec[5])
+    for i in range(len(param_keys)):
+        hparams[param_keys[i]] = float(spec[i])
     return hparams
 
 
@@ -56,6 +61,7 @@ def parse_args():
     parser.add_argument('-trainSpec', help='Path to Training Hyperparam file.', default='./bestModel/train_spec.txt')
     parser.add_argument('-data', help='Path to training instances.', default=os.path.join(data_dir, 'data.bin'))
     parser.add_argument('-target', help='Path to training labels.', default=os.path.join(data_dir, 'labels.bin'))
+    parser.add_argument('-s', dest='train_size', help='Train size', default=None, type=int)
     return parser.parse_args()
 
 
@@ -76,12 +82,14 @@ if __name__ == '__main__':
     hparams = readHparams(args.trainSpec)
     print('Model initialized!')
 
-    print('Loading data...')
-    train_size = 5000
-
     # Model created, Start loading training data
-    images = torch.Tensor(torchfile.load(args.data))[:train_size]
-    labels = torch.Tensor(torchfile.load(args.target))[:train_size]
+    print('Loading data...')
+    if args.train_size is None:
+        images = torch.Tensor(torchfile.load(args.data))
+        labels = torch.Tensor(torchfile.load(args.target))
+    else:
+        images = torch.Tensor(torchfile.load(args.data))[:args.train_size]
+        labels = torch.Tensor(torchfile.load(args.target))[:args.train_size]
 
     # Reshape to (#instances, -1) and Scale to [0,1]
     images = images.view(images.size(0), -1)/255.0

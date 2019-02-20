@@ -70,15 +70,16 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
 
 
 def train(model, hparams, instances, labels, model_path, model_config, log_interval=None):
-    batch_size = hparams['batch_size']
+    batch_size = int(hparams['batch_size'])
     lr = hparams['learning_rate']
-    num_epochs = hparams['num_epochs']
+    lr_decay = hparams['learning_rate_decay']
+    num_epochs = int(hparams['num_epochs'])
     momentum = hparams['momentum']
-    verbose = hparams['verbose']
+    verbose = bool(hparams['verbose'])
 
     count_instances = instances.size(0)
     criterion = Criterion()
-    optimizer = Optimizer(model, lr=lr, momentum=momentum)
+    optimizer = Optimizer(model, lr=lr, lr_decay=lr_decay, momentum=momentum)
 
     train_idx, valid_idx = split_dataset(count_instances, hparams['train_ratio'])
     train_batches = BatchLoader(train_idx, batch_size, instances, labels, True)
@@ -97,6 +98,8 @@ def train(model, hparams, instances, labels, model_path, model_config, log_inter
         metrics = run_epoch('valid', model, criterion, optimizer, valid_batches, epoch, writer, log_interval)
         if verbose:
             print('Validation: {}'.format(metrics))
+
+        optimizer.updateLR()
 
         if metrics['acc'] > best_acc:
             best_acc = metrics['acc']
