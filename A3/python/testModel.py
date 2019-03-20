@@ -8,6 +8,9 @@ from src.Model import Model
 from src.Linear import Linear
 from src.ReLU import ReLU
 from src.Dropout import Dropout
+from src.SimpleConvolution2D import SimpleConvolution2D
+from src.SimpleMaxPool2D import SimpleMaxPool2D
+from src.Flat import Flat
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
@@ -29,8 +32,17 @@ def getModel(config_file):
             il += 1
         elif desc[0] == 'relu':
             layer = ReLU()
+        elif desc[0] == 'flat':
+            layer = Flat()
         elif desc[0] == 'dropout':
-            layer = Dropout(float(desc[1]), isTrain=False)
+            layer = Dropout(float(desc[1]), isTrain=True)
+        elif desc[0] == 'conv':
+            layer = SimpleConvolution2D(int(desc[1]))
+            layer.W = torch.Tensor(weights[il])
+            layer.B = torch.Tensor(biases[il])
+            il += 1
+        elif desc[0] == 'max':
+            layer = SimpleMaxPool2D(int(desc[1]))
         else:
             print(desc[0] + ' layer not implemented!')
         model.addLayer(layer)
@@ -59,15 +71,17 @@ if __name__ == '__main__':
 
     print('Loading data...')
     # Model created, Start loading testing data
-    images = torchfile.load(args.data)
+    images = torch.Tensor(torchfile.load(args.data))
 
     if args.downsample:
         downsample_idx = range(0,108,2)
         images = images[:,downsample_idx,:][:,:,downsample_idx]
 
     # Reshape to (#instances, -1) and Scale to [0,1]
-    images = torch.Tensor(torchfile.load(args.data))
-    images = images.view(images.size(0), -1)/255.0
+    images = images.view(images.size(0), -1)
+    images_mean = images.mean(dim=0)
+    images_sd = images.std(dim=0)
+    images = (images-images_mean)/images_sd
 
     print('Predicting labels...')
     predictions = test(model, images)

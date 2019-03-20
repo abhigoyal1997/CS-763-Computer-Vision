@@ -1,10 +1,11 @@
-linear 2916 1000
+conv 3
+max 2
 relu
-linear 1000 500
+flat
+linear 2809 250
 relu
-linear 500 100
+linear 250 100
 relu
-linear 100 50
+linear 100 25
 relu
-dropout 0.5
-linear 50 6
+linear 25 6

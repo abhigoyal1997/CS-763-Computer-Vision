@@ -8,6 +8,9 @@ from src.Model import Model
 from src.Linear import Linear
 from src.ReLU import ReLU
 from src.Dropout import Dropout
+from src.SimpleConvolution2D import SimpleConvolution2D
+from src.SimpleMaxPool2D import SimpleMaxPool2D
+from src.Flat import Flat
 
 from src.training import train
 torch.set_default_tensor_type(torch.DoubleTensor)  # As asked in assignment to use double tensor
@@ -27,8 +30,14 @@ def createModel(spec_file):
             num_linear_layers += 1
         elif desc[0] == 'relu':
             layer = ReLU()
+        elif desc[0] == 'flat':
+            layer = Flat()
         elif desc[0] == 'dropout':
             layer = Dropout(float(desc[1]), isTrain=True)
+        elif desc[0] == 'conv':
+            layer = SimpleConvolution2D(int(desc[1]))
+        elif desc[0] == 'max':
+            layer = SimpleMaxPool2D(int(desc[1]))
         else:
             print(desc[0] + ' layer not implemented!')
         model.addLayer(layer)
@@ -49,7 +58,10 @@ def readHparams(spec_file):
     ]
     hparams = {}
     for i in range(len(param_keys)):
-        hparams[param_keys[i]] = float(spec[i])
+        if '.' in spec[i]:
+            hparams[param_keys[i]] = float(spec[i])
+        else:
+            hparams[param_keys[i]] = int(spec[i])
     return hparams
 
 
@@ -63,6 +75,7 @@ def parse_args():
     parser.add_argument('-target', help='Path to training labels.', default=os.path.join(data_dir, 'labels.bin'))
     parser.add_argument('-s', dest='train_size', help='Train size', default=None, type=int)
     parser.add_argument('--downsample', action='store_true', default=False)
+    parser.add_argument('--convolution', action='store_true', default=False)
     return parser.parse_args()
 
 
@@ -97,7 +110,12 @@ if __name__ == '__main__':
         images = images[:,downsample_idx,:][:,:,downsample_idx]
 
     # Reshape to (#instances, -1) and Scale to [0,1]
-    images = images.view(images.size(0), -1)/255.0
+    if not args.convolution:
+        images = images.view(images.size(0), -1)
+    # images_mean = images.mean(dim=0)
+    # images_sd = images.std(dim=0)
+    # images = (images-images_mean)/images_sd
+    images = images/255.0
 
     print('Training model...')
     train(model, hparams, images, labels, model_path, model_config, log_interval=1)
