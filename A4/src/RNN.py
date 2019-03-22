@@ -9,7 +9,7 @@ class RNN(Layer):
         self.Bhh = torch.zeros(hidden_features, 1)
 
         self.Wxh = torch.randn(hidden_features, in_features)*math.sqrt(2.0/in_features)
-        # self.Bxh = torch.zeros(hidden_features, 1) #@Argument1
+        # self.Bxh = torch.zeros(hidden_features, 1) #@Reason1
 
         self.Why = torch.randn(out_features, hidden_features)*math.sqrt(2.0/hidden_features)
         self.Bhy = torch.zeros(out_features, 1)        
@@ -18,7 +18,7 @@ class RNN(Layer):
         self.gradBhh = torch.zeros(self.Bhh.shape)
 
         self.gradWxh = torch.zeros(self.Wxh.shape)
-        # self.gradBxh = torch.zeros(self.Bxh.shape) #@Argument1
+        # self.gradBxh = torch.zeros(self.Bxh.shape) #@Reason1
 
         self.gradWhy = torch.zeros(self.Why.shape)
         self.gradBhy = torch.zeros(self.Bhy.shape)
@@ -36,7 +36,6 @@ class RNN(Layer):
             temp_1 = temp_1 + self.Bhh.t().expand_as(temp_1)
 
             temp_2 = input[:,t,:].mm(self.Wxh.t())
-            # temp_2 = temp_2 + self.Bxh.t().expand_as(temp_2) #@Argument1
 
             hidden_vector = torch.tanh(temp_1 + temp_2)
             self.hidden_states.append(hidden_vector)
@@ -72,6 +71,6 @@ class RNN(Layer):
         self.gradBhy[:] = 0
 
 '''
-Argument1 : Two bias terms for Bhh and Bxh not needed, since temp_1 and temp_2 are added before tanh()
+Reason1 : Two bias terms for Bhh and Bxh not needed, since temp_1 and temp_2 are added before tanh()
             So essentially, we only need one bias term for these two. We keep Bhh.
 '''

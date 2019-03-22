@@ -1,3 +1,4 @@
+# For the special case when it is binary classification (ie, only one logit)
 class Criterion():
     def __call__(self, input, target):
         return self.forward(input, target)
