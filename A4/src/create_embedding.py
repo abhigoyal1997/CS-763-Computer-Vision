@@ -6,7 +6,7 @@ veclen = 0
 trainpath = '../../../A4_data/train_data.txt'
 
 def one_hot_encode(ind, obj):
-	vec = np.zeros((veclen,), dtype=np.float32)
+	vec = [0.0]*veclen #np.zeros((veclen,), dtype=np.float32)
 	if obj not in ['_PAD','_UNK']:
 		vec[ind] = 1.0
 	return vec

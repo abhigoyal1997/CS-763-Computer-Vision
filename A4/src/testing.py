@@ -4,10 +4,10 @@ from tqdm import tqdm
 from src.BatchLoader import BatchLoader
 
 
-def test(model, instances):
+def test(model, instances, lengths):
     count_instances = instances.shape[0]
     batch_size = 128
-    batches = BatchLoader(range(count_instances), batch_size, instances)
+    batches = BatchLoader(range(count_instances), batch_size, instances, lengths)
 
     predicted_labels = []
     for x in tqdm(batches, desc='Predicting: ', total=len(batches)):

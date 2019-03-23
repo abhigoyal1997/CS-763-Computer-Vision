@@ -29,7 +29,7 @@ def createModel(spec_file):
         else:
             print(desc[0] + ' layer not implemented!')
         model.addLayer(layer)
-    return model, (spec, num_linear_layers)
+    return model, (spec, num_layers)
 
 
 def readHparams(spec_file):
@@ -81,11 +81,8 @@ if __name__ == '__main__':
 
     # Model created, Start loading training data
     print('Loading data...')
-    data = get_data(args.data)
-    labels = get_labels(args.labels)
-    if args.train_size is not None:
-        data = data[:args.train_size]
-        labels = labels[:args.train_size]
+    data, lengths = get_data(args.data, limit=args.train_size)
+    labels = get_labels(args.target, limit=args.train_size)
 
     print('Training model...')
-    train(model, hparams, data, labels, model_path, model_config, log_interval=1)
+    train(model, hparams, data, lengths, labels, model_path, model_config, log_interval=1)

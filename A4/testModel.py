@@ -60,9 +60,9 @@ if __name__ == '__main__':
 
     print('Loading data...')
     # Model created, Start loading testing data
-    data = get_data(args.data)
+    data, lengths = get_data(args.data)
 
     print('Predicting labels...')
-    predictions = test(model, data)
+    predictions = test(model, data, lengths)
     torch.save(predictions, 'testPrediction.bin')
     print('Predictions saved to testPrediction.bin')

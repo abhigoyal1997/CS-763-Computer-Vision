@@ -1,9 +1,10 @@
 from collections import Counter
 import numpy as np
 import torch
-from create_embedding import get_embedding
+import json
 
 maxlen = 0
+embedpath = '../../A4_data/embedding.txt'
 
 def pad_sequence(s):
 	global maxlen
@@ -14,18 +15,23 @@ def pad_sequence(s):
 		padded[:len(s)] = s
 	return padded
 
-def get_data(filepath):
+def get_data(filepath, limit=None):
 	global maxlen
 	content = []
 	with open(filepath) as f:
 		for line in f.readlines():
+			if limit is not None and len(content) >= limit:
+				break
 			content.append(line.strip().split(" "))
 
 	maxlen = max([len(s) for s in content])
-	word2emb = get_embedding()
+	with open(embedpath,'r') as file:
+		word2emb = json.loads(file.read())
 	
 	padded_content = [pad_sequence(s) for s in content]
 	final_content = [[word2emb[elem] for elem in s] for s in padded_content]
 	final_data = torch.Tensor(final_content)
 
-	return final_data
+	lengths = [len(s) for s in content]
+
+	return final_data, lengths

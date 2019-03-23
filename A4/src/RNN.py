@@ -42,7 +42,7 @@ class RNN(Layer):
         self.output = [] # will populate with the unrolled outputs of each cell
         for t in range(time_steps):
             temp = hidden_vector.mm(self.Whh.t())
-            temp = temp + self.Bhh.t().expand_as(temp_1)
+            temp = temp + self.Bhh.t().expand_as(temp)
             temp = temp + input[:,t,:].mm(self.Wxh.t())
 
             hidden_vector = torch.tanh(temp)
@@ -51,6 +51,7 @@ class RNN(Layer):
             temp_output = hidden_vector.mm(self.Why.t())
             output = temp_output + self.Bhy.t().expand_as(temp_output)
             self.output.append(output)
+        self.output = torch.stack(self.output, dim=1)
         return self.output
 
     def backward(self, input, gradOutput):
@@ -94,7 +95,6 @@ class RNN(Layer):
         self.gradWhh[:] = 0
         self.gradBhh[:] = 0
         self.gradWxh[:] = 0
-        self.gradBxh[:] = 0
         self.gradWhy[:] = 0
         self.gradBhy[:] = 0
 

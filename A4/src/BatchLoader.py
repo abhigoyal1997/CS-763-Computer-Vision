@@ -2,11 +2,12 @@ import numpy as np
 
 
 class BatchLoader():
-    def __init__(self, indices, batch_size, data, labels=None, shuffle=False):
+    def __init__(self, indices, batch_size, data, lengths, labels=None, shuffle=False):
         self.indices = indices
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.data = data
+        self.lengths = lengths
         self.labels = labels
 
     def __iter__(self):
@@ -16,19 +17,29 @@ class BatchLoader():
         while idx+self.batch_size <= len(self.indices):
             batch_idx = self.indices[idx:idx+self.batch_size]
 
+            batch = self.data[batch_idx]
+            maxLen = 0
+            for elem in batch_idx:
+                maxLen = max(maxLen,self.lengths[elem])
+            batch = batch[:,:maxLen,:]
             if self.labels is None:
-                yield self.data[batch_idx]
+                yield batch
             else:
-                yield self.data[batch_idx], self.labels[batch_idx]
+                yield batch, self.labels[batch_idx]
 
             idx += self.batch_size
         if idx < len(self.indices):
             batch_idx = self.indices[idx:]
 
+            batch = self.data[batch_idx]
+            maxLen = 0
+            for elem in batch_idx:
+                maxLen = max(maxLen,self.lengths[elem])
+            batch = batch[:,:maxLen,:]
             if self.labels is None:
-                yield self.data[batch_idx]
+                yield batch
             else:
-                yield self.data[batch_idx], self.labels[batch_idx]
+                yield batch, self.labels[batch_idx]
 
     def __len__(self):
         return int((len(self.indices) + self.batch_size - 1)/self.batch_size)

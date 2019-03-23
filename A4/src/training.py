@@ -70,7 +70,7 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
     return {'loss': loss, 'acc': accuracy}
 
 
-def train(model, hparams, instances, labels, model_path, model_config, log_interval=None):
+def train(model, hparams, instances, lengths, labels, model_path, model_config, log_interval=None):
     batch_size = int(hparams['batch_size'])
     lr = hparams['learning_rate']
     lr_decay = hparams['learning_rate_decay']
@@ -83,8 +83,8 @@ def train(model, hparams, instances, labels, model_path, model_config, log_inter
     optimizer = Optimizer(model, lr=lr, lr_decay=lr_decay, momentum=momentum)
 
     train_idx, valid_idx = split_dataset(count_instances, hparams['train_ratio'])
-    train_batches = BatchLoader(train_idx, batch_size, instances, labels, True)
-    valid_batches = BatchLoader(valid_idx, batch_size, instances, labels)
+    train_batches = BatchLoader(train_idx, batch_size, instances, lengths, labels, True)
+    valid_batches = BatchLoader(valid_idx, batch_size, instances, lengths, labels)
 
     writer = SummaryWriter(log_dir='logs/{}_{}'.format(model_path, time()))
 
