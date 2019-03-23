@@ -3,7 +3,7 @@ import math
 from src.Layer import Layer
 
 class RNN(Layer):
-    def __init__(self, in_features, hidden_features, out_features):
+    def __init__(self, in_features, hidden_features, out_features, last_layer=False):
         super(RNN, self).__init__()
         self.Whh = torch.randn(hidden_features, hidden_features)*math.sqrt(2.0/hidden_features)
         self.Bhh = torch.zeros(hidden_features, 1)
@@ -30,6 +30,8 @@ class RNN(Layer):
 
         self.stepWhy = torch.zeros(self.Why.shape)
         self.stepBhy = torch.zeros(self.Bhy.shape)
+
+        self.last_layer = last_layer
 
     def __repr__(self):
         return 'RNN-{}'.format(tuple(self.Wxh.t().shape))
@@ -58,7 +60,10 @@ class RNN(Layer):
         ## Assuming gradOutput is batch_size X seq_length X out_features, input as before
         _, time_steps, _ = list(input.shape)
         self.gradInput = torch.zeros_like(input) #@Reason2
-        for t in range(time_steps-1,-1,-1):
+        lower_lim = -1
+        if self.last_layer:
+            lower_lim = time_steps-2
+        for t in range(time_steps-1,lower_lim,-1):
             gradOutput_ = gradOutput[:,t,:] # batch_size x out_features
             self.gradWhy += gradOutput_.t().mm(self.hidden_states[t+1])
             self.gradBhy += gradOutput_.sum(dim=0, keepdim=True).t()

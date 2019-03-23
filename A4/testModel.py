@@ -12,7 +12,7 @@ from src.testing import test
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
-def getModel(config_file):
+def getModel(config_file): # No need to specify last_layer as we don't need to do backward pass
     with open(config_file,'r') as f:
         config = f.readlines()
     Whh = torch.load(config[-5].strip())

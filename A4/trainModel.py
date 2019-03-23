@@ -18,13 +18,15 @@ RANDOM_SEED = 12345
 def createModel(spec_file):
     with open(spec_file,'r') as f:
         spec = f.readlines()
+    lenspec = len(spec)
     model = Model()
     num_layers = 0
-    for desc in spec:
+    for desc_ind in range(lenspec):
+        desc = spec[desc_ind]
         desc = desc.split()
         if desc[0] == 'rnn':
             in_features, hidden_features, out_features = int(desc[1]), int(desc[2]), int(desc[3])
-            layer = RNN(in_features, hidden_features, out_features)
+            layer = RNN(in_features, hidden_features, out_features, last_layer=(desc_ind==lenspec-1))
             num_layers += 1
         else:
             print(desc[0] + ' layer not implemented!')

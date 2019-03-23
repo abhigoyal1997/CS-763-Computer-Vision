@@ -62,7 +62,7 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
         i += 1
 
     loss = loss/len(batches)
-    accuracy = (predictions == y_true.long()).double().mean().item()
+    accuracy = (predictions == y_true).double().mean().item()
     if writer is not None:
         writer.add_scalar('{}_acc'.format(mode), accuracy, epoch)
         if mode == 'valid':
