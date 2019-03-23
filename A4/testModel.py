@@ -3,9 +3,12 @@ import os
 import torchfile
 import torch
 
-from src.testing import test
 from src.Model import Model
 from src.RNN import RNN
+
+from src.read_data import get_data 
+
+from src.testing import test
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
@@ -52,13 +55,12 @@ if __name__ == '__main__':
     # To load the model from the directory
     configPath = os.path.join('./' + args.modelName, 'config.txt')
 
-    # Get Model (using checkModel.py)
     model = getModel(configPath)
     print('Model initialized!')
 
     print('Loading data...')
     # Model created, Start loading testing data
-    data = # TODO using read_data from src
+    data = get_data(args.data)
 
     print('Predicting labels...')
     predictions = test(model, data)

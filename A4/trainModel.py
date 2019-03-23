@@ -7,6 +7,9 @@ import numpy as np
 from src.Model import Model
 from src.RNN import RNN
 
+from src.read_data import get_data
+from src.read_labels import get_labels
+
 from src.training import train
 torch.set_default_tensor_type(torch.DoubleTensor)  # As asked in assignment to use double tensor
 RANDOM_SEED = 12345
@@ -78,8 +81,8 @@ if __name__ == '__main__':
 
     # Model created, Start loading training data
     print('Loading data...')
-    data = # TODO using read_data from src
-    labels = # TODO using read_data from src
+    data = get_data(args.data)
+    labels = get_labels(args.labels)
     if args.train_size is not None:
         data = data[:args.train_size]
         labels = labels[:args.train_size]
