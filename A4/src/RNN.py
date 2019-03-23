@@ -12,7 +12,7 @@ class RNN(Layer):
         # self.Bxh = torch.zeros(hidden_features, 1) #@Reason1
 
         self.Why = torch.randn(out_features, hidden_features)*math.sqrt(2.0/hidden_features)
-        self.Bhy = torch.zeros(out_features, 1)        
+        self.Bhy = torch.zeros(out_features, 1)
 
         self.gradWhh = torch.zeros(self.Whh.shape)
         self.gradBhh = torch.zeros(self.Bhh.shape)
@@ -31,35 +31,38 @@ class RNN(Layer):
         _, time_steps, _ = list(input.shape)
         hidden_vector = torch.zeros_like(input[:,0,:].mm(self.Wxh.t())) # batch_size x hidden_features
         self.hidden_states = [hidden_vector] # also storing the initial zero-state
+        self.output = [] # will populate with the unrolled outputs of each cell
         for t in range(time_steps):
-            temp_1 = hidden_vector.mm(self.Whh.t())
-            temp_1 = temp_1 + self.Bhh.t().expand_as(temp_1)
+            temp = hidden_vector.mm(self.Whh.t())
+            temp = temp + self.Bhh.t().expand_as(temp_1)
+            temp = temp + input[:,t,:].mm(self.Wxh.t())
 
-            temp_2 = input[:,t,:].mm(self.Wxh.t())
-
-            hidden_vector = torch.tanh(temp_1 + temp_2)
+            hidden_vector = torch.tanh(temp)
             self.hidden_states.append(hidden_vector)
 
-        temp_output = hidden_vector.mm(self.Why.t())
-        self.output = temp_output + self.Bhy.t().expand_as(temp_output)
+            temp_output = hidden_vector.mm(self.Why.t())
+            output = temp_output + self.Bhy.t().expand_as(temp_output)
+            self.output.append(output)
         return self.output
 
     def backward(self, input, gradOutput):
+        ## Assuming gradOutput is batch_size X seq_length X out_features, input as before
         _, time_steps, _ = list(input.shape)
-        # Pass the gradients through the output layer
-        # gradOutput - batch_size x out_features
-        self.gradWhy = gradOutput.t().mm(self.hidden_states[-1])
-        self.gradBhy = gradOutput.sum(dim=0, keepdim=True).t()
-        gradOutput = gradOutput.mm(self.Why)
-        # Loop over time and pass the gradients through hidden and input layers
-        # gradOutput - batch_size x hidden_features
-        for t in range(time_steps,0,-1):
-            gradOutput = gradOutput.mul(1 - self.hidden_states[t]**2)
-            self.gradWhh += gradOutput.t().mm(self.hidden_states[t-1])
-            self.gradBhh += gradOutput.sum(dim=0, keepdim=True).t()
-            self.gradWxh += gradOutput.t().mm(input[:,t-1,:])
-            gradOutput = gradOutput.mm(self.Whh)
-        return gradOutput
+        self.gradInput = torch.zeros_like(input) #@Reason2
+        for t in range(time_steps-1,-1,-1):
+            gradOutput_ = gradOutput[:,t,:] # batch_size x out_features
+            self.gradWhy += gradOutput_.t().mm(self.hidden_states[t+1])
+            self.gradBhy += gradOutput_.sum(dim=0, keepdim=True).t()
+            gradOutput_ = gradOutput_.mm(self.Why) # batch_size x hidden_features
+            ## Loop over time and pass the gradients through hidden and input layers
+            for bptt in range(t+1,0,-1):
+                gradOutput_ = gradOutput_.mul(1 - self.hidden_states[bptt]**2)
+                self.gradWhh += gradOutput_.t().mm(self.hidden_states[bptt-1])
+                self.gradBhh += gradOutput_.sum(dim=0, keepdim=True).t()
+                self.gradWxh += gradOutput_.t().mm(input[:,bptt-1,:])
+                self.gradInput[:,bptt-1,:] += gradOutput_.mm(self.Wxh) # batch_size x in_features
+                gradOutput_ = gradOutput_.mm(self.Whh)
+        return self.gradInput
 
     def clearGradParam(self):
         super(RNN, self).clearGradParam()
@@ -71,6 +74,7 @@ class RNN(Layer):
         self.gradBhy[:] = 0
 
 '''
-Reason1 : Two bias terms for Bhh and Bxh not needed, since temp_1 and temp_2 are added before tanh()
+Reason1 : Two bias terms for Bhh and Bxh not needed, since terms are added before tanh().
             So essentially, we only need one bias term for these two. We keep Bhh.
+Reason2 : Need to init here, because if we don't then it is None in first backward pass.
 '''

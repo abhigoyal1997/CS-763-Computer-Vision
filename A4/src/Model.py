@@ -33,7 +33,7 @@ class Model():
 
     def getGradients(self):
         gradients = {}
-        for x in ['gradWhh','gradWxh','gradWhy','gradBhh','gradBxh','gradBhy', 'gradInput']:
+        for x in ['gradWhh','gradWxh','gradWhy','gradBhh','gradBhy', 'gradInput']: #removed 'gradBxh'
             gradients[x] = []
             for layer in self.layers:
                 if hasattr(layer, x):
@@ -42,7 +42,7 @@ class Model():
 
     def getParams(self):
         params = {}
-        for x in ['Whh','Wxh','Why','Bhh','Bxh','Bhy']:
+        for x in ['Whh','Wxh','Why','Bhh','Bhy']: #removed 'Bxh'
             params[x] = []
             for layer in self.layers:
                 if hasattr(layer, x):
