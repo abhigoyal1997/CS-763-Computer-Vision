@@ -18,10 +18,18 @@ class RNN(Layer):
         self.gradBhh = torch.zeros(self.Bhh.shape)
 
         self.gradWxh = torch.zeros(self.Wxh.shape)
-        # self.gradBxh = torch.zeros(self.Bxh.shape) #@Reason1
 
         self.gradWhy = torch.zeros(self.Why.shape)
         self.gradBhy = torch.zeros(self.Bhy.shape)
+
+        ## For momentum step storing 
+        self.stepWhh = torch.zeros(self.Whh.shape)
+        self.stepBhh = torch.zeros(self.Bhh.shape)
+
+        self.stepWxh = torch.zeros(self.Wxh.shape)
+
+        self.stepWhy = torch.zeros(self.Why.shape)
+        self.stepBhy = torch.zeros(self.Bhy.shape)
 
     def __repr__(self):
         return 'RNN-{}'.format(tuple(self.Wxh.t().shape))
@@ -63,6 +71,23 @@ class RNN(Layer):
                 self.gradInput[:,bptt-1,:] += gradOutput_.mm(self.Wxh) # batch_size x in_features
                 gradOutput_ = gradOutput_.mm(self.Whh)
         return self.gradInput
+
+    def gradientStep(self, lr, momentum):
+        self.stepWhh = momentum*self.stepWhh + lr*self.gradWhh
+        self.stepBhh = momentum*self.stepBhh + lr*self.gradBhh
+        
+        self.stepWxh = momentum*self.stepWxh + lr*self.gradWxh
+
+        self.stepWhy = momentum*self.stepWhy + lr*self.gradWhy
+        self.stepBhy = momentum*self.stepBhy + lr*self.gradBhy
+        
+        self.Whh -= self.stepWhh
+        self.Bhh -= self.stepBhh
+
+        self.Wxh -= self.stepWxh
+
+        self.Why -= self.stepWhy
+        self.Bhy -= self.stepBhy
 
     def clearGradParam(self):
         super(RNN, self).clearGradParam()

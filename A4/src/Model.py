@@ -1,7 +1,7 @@
 class Model():
-    def __init__(self, layers=[], H, V, D):
-        self.layers = []
-        self.nLayers = 0
+    def __init__(self, layers=[], H=None, V=None, D=None):
+        self.layers = layers
+        self.nLayers = len(layers)
         self.H = H
         self.V = V
         self.D = D
