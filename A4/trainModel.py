@@ -42,7 +42,6 @@ def readHparams(spec_file):
         'learning_rate',
         'learning_rate_decay',
         'num_epochs',
-        'momentum',
         'verbose',
         'train_ratio'
     ]

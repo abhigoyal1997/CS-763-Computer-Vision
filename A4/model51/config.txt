@@ -1,0 +1,12 @@
+1
+rnn 149 64 1
+./model51/Whh.bin
+./model51/Whh.bin
+./model51/Wxh.bin
+./model51/Wxh.bin
+./model51/Why.bin
+./model51/Why.bin
+./model51/Bhh.bin
+./model51/Bhh.bin
+./model51/Bhy.bin
+./model51/Bhy.bin

@@ -44,11 +44,11 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
             # Backward Pass
             model.clearGradParam()  # Clear Grad
             gradient = criterion.backward(logits, lengths, y)
+            # print(gradient.shape)
+            # print(gradient.norm())
             model.backward(x, gradient)
-            # Gradients check
             # gradNorms = model.getGradientNorms()
             # print("Model Gradient Norms:", gradNorms)
-            # Weights update
             optimizer.updateStep()
 
         # Update metrics
@@ -79,12 +79,11 @@ def train(model, hparams, instances, lengths, labels, model_path, model_config, 
     lr = hparams['learning_rate']
     lr_decay = hparams['learning_rate_decay']
     num_epochs = int(hparams['num_epochs'])
-    momentum = hparams['momentum']
     verbose = bool(hparams['verbose'])
 
     count_instances = instances.size(0)
     criterion = Criterion()
-    optimizer = Optimizer(model, lr=lr, lr_decay=lr_decay, momentum=momentum)
+    optimizer = Optimizer(model, lr=lr, lr_decay=lr_decay)
 
     train_idx, valid_idx = split_dataset(count_instances, hparams['train_ratio'])
     train_batches = BatchLoader(train_idx, batch_size, instances, lengths, labels, True)

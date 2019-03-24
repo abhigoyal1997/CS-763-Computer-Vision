@@ -1,9 +1,10 @@
 import torch
 import math
+import numpy as np
 from src.Layer import Layer
 
 class RNN(Layer):
-    def __init__(self, in_features, hidden_features, out_features, grad_thresh=1e3, back_thresh=1e-4):
+    def __init__(self, in_features, hidden_features, out_features, grad_thresh=1e1, back_thresh=1e-4):
         super(RNN, self).__init__()
         self.Whh = torch.randn(hidden_features, hidden_features)*math.sqrt(2.0/hidden_features)
         self.Bhh = torch.zeros(hidden_features, 1)
@@ -23,13 +24,21 @@ class RNN(Layer):
         self.gradBhy = torch.zeros(self.Bhy.shape)
 
         ## For momentum step storing 
-        self.stepWhh = torch.zeros(self.Whh.shape)
-        self.stepBhh = torch.zeros(self.Bhh.shape)
+        self.mWhh = torch.zeros(self.Whh.shape)
+        self.mBhh = torch.zeros(self.Bhh.shape)
 
-        self.stepWxh = torch.zeros(self.Wxh.shape)
+        self.mWxh = torch.zeros(self.Wxh.shape)
 
-        self.stepWhy = torch.zeros(self.Why.shape)
-        self.stepBhy = torch.zeros(self.Bhy.shape)
+        self.mWhy = torch.zeros(self.Why.shape)
+        self.mBhy = torch.zeros(self.Bhy.shape)
+
+        self.cWhh = torch.zeros(self.Whh.shape)
+        self.cBhh = torch.zeros(self.Bhh.shape)
+
+        self.cWxh = torch.zeros(self.Wxh.shape)
+
+        self.cWhy = torch.zeros(self.Why.shape)
+        self.cBhy = torch.zeros(self.Bhy.shape)
 
         self.grad_thresh = grad_thresh
         self.back_thresh = back_thresh
@@ -97,22 +106,34 @@ class RNN(Layer):
         if normBhy > self.grad_thresh:
             self.gradBhy *= (self.grad_thresh/normBhy)
 
-    def gradientStep(self, lr, momentum):
-        self.stepWhh = momentum*self.stepWhh + lr*self.gradWhh
-        self.stepBhh = momentum*self.stepBhh + lr*self.gradBhh
-        
-        self.stepWxh = momentum*self.stepWxh + lr*self.gradWxh
+    def gradientStep(self, lr, alpha, zeta, eps):
+        self.mWhh = alpha*self.mWhh + (1-alpha)*self.gradWhh
+        self.cWhh = zeta*self.cWhh + (1-zeta)*self.gradWhh**2
+        self.stepWhh = -1*lr*self.mWhh/(np.sqrt(self.cWhh) + eps)
 
-        self.stepWhy = momentum*self.stepWhy + lr*self.gradWhy
-        self.stepBhy = momentum*self.stepBhy + lr*self.gradBhy
-        
-        self.Whh -= self.stepWhh
-        self.Bhh -= self.stepBhh
+        self.mBhh = alpha*self.mBhh + (1-alpha)*self.gradBhh
+        self.cBhh = zeta*self.cBhh + (1-zeta)*self.gradBhh**2
+        self.stepBhh = -1*lr*self.mBhh/(np.sqrt(self.cBhh) + eps)
 
-        self.Wxh -= self.stepWxh
+        self.mWxh = alpha*self.mWxh + (1-alpha)*self.gradWxh
+        self.cWxh = zeta*self.cWxh + (1-zeta)*self.gradWxh**2
+        self.stepWxh = -1*lr*self.mWxh/(np.sqrt(self.cWxh) + eps)
 
-        self.Why -= self.stepWhy
-        self.Bhy -= self.stepBhy
+        self.mWhy = alpha*self.mWhy + (1-alpha)*self.gradWhy
+        self.cWhy = zeta*self.cWhy + (1-zeta)*self.gradWhy**2
+        self.stepWhy = -1*lr*self.mWhy/(np.sqrt(self.cWhy) + eps)
+
+        self.mBhy = alpha*self.mBhy + (1-alpha)*self.gradBhy
+        self.cBhy = zeta*self.cBhy + (1-zeta)*self.gradBhy**2
+        self.stepBhy = -1*lr*self.mBhy/(np.sqrt(self.cBhy) + eps)
+
+        self.Whh += self.stepWhh
+        self.Bhh += self.stepBhh
+
+        self.Wxh += self.stepWxh
+
+        self.Why += self.stepWhy
+        self.Bhy += self.stepBhy
 
     def clearGradParam(self):
         super(RNN, self).clearGradParam()

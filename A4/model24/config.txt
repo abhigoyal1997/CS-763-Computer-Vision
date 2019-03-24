@@ -1,0 +1,12 @@
+1
+rnn 149 64 1
+./model24/Whh.bin
+./model24/Whh.bin
+./model24/Wxh.bin
+./model24/Wxh.bin
+./model24/Why.bin
+./model24/Why.bin
+./model24/Bhh.bin
+./model24/Bhh.bin
+./model24/Bhy.bin
+./model24/Bhy.bin

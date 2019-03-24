@@ -8,7 +8,6 @@ class Criterion():
         return self.forward(input, lengths, target)
 
     def forward(self, input, lengths, target):
-        # print(input.size(0))
         logits = torch.Tensor([input[i,lengths[i]-1,0] for i in range(input.size(0))])
         p_pred = logits.sigmoid()
         p_true = target.squeeze().double()
@@ -19,10 +18,7 @@ class Criterion():
         for i in range(input.size(0)):
             onoff[i,lengths[i]-1,0] = 1.0
         p_pred = input.double().sigmoid()
-        p_true = target.double().expand_as(p_pred.squeeze().t()).t()
-        p_true = p_true.unsqueeze(dim=2)
-        # print(p_true.shape)
-        # print(p_pred.shape)
+        p_true = target.double().expand_as(p_pred.squeeze().t()).t().unsqueeze(dim=2)
         gradInput = p_pred - p_true
         batch_size = target.size(0)
         gradInput /= batch_size
