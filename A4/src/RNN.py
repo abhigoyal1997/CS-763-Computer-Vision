@@ -3,7 +3,7 @@ import math
 from src.Layer import Layer
 
 class RNN(Layer):
-    def __init__(self, in_features, hidden_features, out_features, last_layer=False, grad_thresh=1e3):
+    def __init__(self, in_features, hidden_features, out_features, grad_thresh=1e3, back_thresh=1e-4):
         super(RNN, self).__init__()
         self.Whh = torch.randn(hidden_features, hidden_features)*math.sqrt(2.0/hidden_features)
         self.Bhh = torch.zeros(hidden_features, 1)
@@ -32,7 +32,7 @@ class RNN(Layer):
         self.stepBhy = torch.zeros(self.Bhy.shape)
 
         self.grad_thresh = grad_thresh
-        self.last_layer = last_layer
+        self.back_thresh = back_thresh
 
     def __repr__(self):
         return 'RNN-{}'.format(tuple(self.Wxh.t().shape))
@@ -61,22 +61,20 @@ class RNN(Layer):
         ## Assuming gradOutput is batch_size X seq_length X out_features, input as before
         _, time_steps, _ = list(input.shape)
         self.gradInput = torch.zeros_like(input) #@Reason2
-        lower_lim = -1
-        if self.last_layer:
-            lower_lim = time_steps-2
-        for t in range(time_steps-1,lower_lim,-1):
+        for t in range(time_steps-1,-1,-1):
             gradOutput_ = gradOutput[:,t,:] # batch_size x out_features
-            self.gradWhy += gradOutput_.t().mm(self.hidden_states[t+1])
-            self.gradBhy += gradOutput_.sum(dim=0, keepdim=True).t()
-            gradOutput_ = gradOutput_.mm(self.Why) # batch_size x hidden_features
-            ## Loop over time and pass the gradients through hidden and input layers
-            for bptt in range(t+1,0,-1):
-                gradOutput_ = gradOutput_.mul(1 - self.hidden_states[bptt]**2)
-                self.gradWhh += gradOutput_.t().mm(self.hidden_states[bptt-1])
-                self.gradBhh += gradOutput_.sum(dim=0, keepdim=True).t()
-                self.gradWxh += gradOutput_.t().mm(input[:,bptt-1,:])
-                self.gradInput[:,bptt-1,:] += gradOutput_.mm(self.Wxh) # batch_size x in_features
-                gradOutput_ = gradOutput_.mm(self.Whh)
+            if gradOutput_.norm() > self.back_thresh:
+                self.gradWhy += gradOutput_.t().mm(self.hidden_states[t+1])
+                self.gradBhy += gradOutput_.sum(dim=0, keepdim=True).t()
+                gradOutput_ = gradOutput_.mm(self.Why) # batch_size x hidden_features
+                ## Loop over time and pass the gradients through hidden and input layers
+                for bptt in range(t+1,0,-1):
+                    gradOutput_ = gradOutput_.mul(1 - self.hidden_states[bptt]**2)
+                    self.gradWhh += gradOutput_.t().mm(self.hidden_states[bptt-1])
+                    self.gradBhh += gradOutput_.sum(dim=0, keepdim=True).t()
+                    self.gradWxh += gradOutput_.t().mm(input[:,bptt-1,:])
+                    self.gradInput[:,bptt-1,:] += gradOutput_.mm(self.Wxh) # batch_size x in_features
+                    gradOutput_ = gradOutput_.mm(self.Whh)
         self.clipGradients()
         return self.gradInput
 

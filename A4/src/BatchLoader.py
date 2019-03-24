@@ -18,28 +18,26 @@ class BatchLoader():
             batch_idx = self.indices[idx:idx+self.batch_size]
 
             batch = self.data[batch_idx]
-            maxLen = 0
-            for elem in batch_idx:
-                maxLen = max(maxLen,self.lengths[elem])
+            lengths_batch = [self.lengths[elem] for elem in batch_idx]
+            maxLen = max(lengths_batch)
             batch = batch[:,:maxLen,:]
             if self.labels is None:
-                yield batch
+                yield batch, lengths_batch
             else:
-                yield batch, self.labels[batch_idx]
+                yield batch, lengths_batch, self.labels[batch_idx]
 
             idx += self.batch_size
         if idx < len(self.indices):
             batch_idx = self.indices[idx:]
 
             batch = self.data[batch_idx]
-            maxLen = 0
-            for elem in batch_idx:
-                maxLen = max(maxLen,self.lengths[elem])
+            lengths_batch = [self.lengths[elem] for elem in batch_idx]
+            maxLen = max(lengths_batch)
             batch = batch[:,:maxLen,:]
             if self.labels is None:
-                yield batch
+                yield batch, lengths_batch
             else:
-                yield batch, self.labels[batch_idx]
+                yield batch, lengths_batch, self.labels[batch_idx]
 
     def __len__(self):
         return int((len(self.indices) + self.batch_size - 1)/self.batch_size)

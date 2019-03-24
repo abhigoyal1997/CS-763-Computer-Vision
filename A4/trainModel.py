@@ -12,7 +12,7 @@ from src.read_labels import get_labels
 
 from src.training import train
 torch.set_default_tensor_type(torch.DoubleTensor)  # As asked in assignment to use double tensor
-RANDOM_SEED = 12345
+RANDOM_SEED = 2102
 
 
 def createModel(spec_file):
@@ -26,7 +26,7 @@ def createModel(spec_file):
         desc = desc.split()
         if desc[0] == 'rnn':
             in_features, hidden_features, out_features = int(desc[1]), int(desc[2]), int(desc[3])
-            layer = RNN(in_features, hidden_features, out_features, last_layer=(desc_ind==lenspec-1))
+            layer = RNN(in_features, hidden_features, out_features)
             num_layers += 1
         else:
             print(desc[0] + ' layer not implemented!')

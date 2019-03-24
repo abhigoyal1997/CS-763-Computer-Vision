@@ -35,15 +35,15 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
     predictions = None
     y_true = None
     i = 0
-    for x,y in tqdm(batches, desc='Epoch {}: '.format(epoch), total=len(batches)):
+    for x,lengths,y in tqdm(batches, desc='Epoch {}: '.format(epoch), total=len(batches)):
         # Forward Pass
         logits = model(x)
-        batch_loss = criterion(logits, y)
+        batch_loss = criterion(logits, lengths, y)
 
         if mode == 'train':
             # Backward Pass
             model.clearGradParam()  # Clear Grad
-            gradient = criterion.backward(logits, y)
+            gradient = criterion.backward(logits, lengths, y)
             model.backward(x, gradient)
             # Gradients check
             # gradNorms = model.getGradientNorms()
@@ -53,11 +53,12 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
 
         # Update metrics
         loss += batch_loss.item()
+        logits_extracted = torch.Tensor([logits[i,lengths[i]-1,0] for i in range(logits.size(0))])
         if predictions is None:
-            predictions = logits[:,-1,0].sigmoid().round()
+            predictions = logits_extracted.sigmoid().round()
             y_true = y
         else:
-            predictions = torch.cat([predictions, logits[:,-1,0].sigmoid().round()])
+            predictions = torch.cat([predictions, logits_extracted.sigmoid().round()])
             y_true = torch.cat([y_true, y])
 
         if mode == 'train' and (log_interval is not None) and (i % log_interval == 0):

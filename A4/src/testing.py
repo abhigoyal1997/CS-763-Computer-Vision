@@ -10,10 +10,11 @@ def test(model, instances, lengths):
     batches = BatchLoader(range(count_instances), batch_size, instances, lengths)
 
     predicted_labels = []
-    for x in tqdm(batches, desc='Predicting: ', total=len(batches)):
+    for x,lengths in tqdm(batches, desc='Predicting: ', total=len(batches)):
         # Forward
         logits = model.forward(x)
-        predictions = logits[:,-1,0].sigmoid().round()
+        logits_extracted = torch.Tensor([logits[i,lengths[i]-1,0] for i in range(logits.size(0))])
+        predictions = logits_extracted.sigmoid().round()
         predicted_labels += predictions.numpy().tolist()
 
     return np.array(predicted_labels)
