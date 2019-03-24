@@ -15,6 +15,13 @@ def pad_sequence(s):
 		padded[:len(s)] = s
 	return padded
 
+
+def embed(elem, word2emb):
+	try:
+		return word2emb[elem]
+	except:
+		return word2emb['_UNK']
+
 def get_data(filepath, limit=None):
 	global maxlen
 	content = []
@@ -29,7 +36,7 @@ def get_data(filepath, limit=None):
 		word2emb = json.loads(file.read())
 	
 	padded_content = [pad_sequence(s) for s in content]
-	final_content = [[word2emb[elem] for elem in s] for s in padded_content]
+	final_content = [[embed(elem, word2emb) for elem in s] for s in padded_content]
 	final_data = torch.Tensor(final_content)
 
 	lengths = [len(s) for s in content]

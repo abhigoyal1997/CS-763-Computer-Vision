@@ -1,0 +1,12 @@
+1
+rnn 149 256 1
+./modelFull1/Whh.bin
+./modelFull1/Whh.bin
+./modelFull1/Wxh.bin
+./modelFull1/Wxh.bin
+./modelFull1/Why.bin
+./modelFull1/Why.bin
+./modelFull1/Bhh.bin
+./modelFull1/Bhh.bin
+./modelFull1/Bhy.bin
+./modelFull1/Bhy.bin

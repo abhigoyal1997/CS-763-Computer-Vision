@@ -1,0 +1,12 @@
+1
+rnn 149 128 1
+./model6/Whh.bin
+./model6/Whh.bin
+./model6/Wxh.bin
+./model6/Wxh.bin
+./model6/Why.bin
+./model6/Why.bin
+./model6/Bhh.bin
+./model6/Bhh.bin
+./model6/Bhy.bin
+./model6/Bhy.bin

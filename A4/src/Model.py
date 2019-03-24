@@ -1,3 +1,5 @@
+import numpy as np
+
 class Model():
     def __init__(self, layers=[], H=None, V=None, D=None):
         self.layers = layers
@@ -39,6 +41,13 @@ class Model():
                 if hasattr(layer, x):
                     gradients[x].append(eval('layer.'+x).numpy())
         return gradients
+
+    def getGradientNorms(self):
+    	gradients = self.getGradients()
+    	norms = {}
+    	for x in ['gradWhh','gradWxh','gradWhy','gradBhh','gradBhy', 'gradInput']:
+    		norms[x] = max([np.linalg.norm(elem) for elem in gradients[x]])
+    	return norms
 
     def getParams(self):
         params = {}

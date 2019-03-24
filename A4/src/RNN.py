@@ -3,7 +3,7 @@ import math
 from src.Layer import Layer
 
 class RNN(Layer):
-    def __init__(self, in_features, hidden_features, out_features, last_layer=False):
+    def __init__(self, in_features, hidden_features, out_features, last_layer=False, grad_thresh=1e3):
         super(RNN, self).__init__()
         self.Whh = torch.randn(hidden_features, hidden_features)*math.sqrt(2.0/hidden_features)
         self.Bhh = torch.zeros(hidden_features, 1)
@@ -31,6 +31,7 @@ class RNN(Layer):
         self.stepWhy = torch.zeros(self.Why.shape)
         self.stepBhy = torch.zeros(self.Bhy.shape)
 
+        self.grad_thresh = grad_thresh
         self.last_layer = last_layer
 
     def __repr__(self):
@@ -76,7 +77,27 @@ class RNN(Layer):
                 self.gradWxh += gradOutput_.t().mm(input[:,bptt-1,:])
                 self.gradInput[:,bptt-1,:] += gradOutput_.mm(self.Wxh) # batch_size x in_features
                 gradOutput_ = gradOutput_.mm(self.Whh)
+        self.clipGradients()
         return self.gradInput
+
+    def clipGradients(self):
+        normWhh = (self.gradWhh**2).sum().sqrt()
+        if normWhh > self.grad_thresh:
+            self.gradWhh *= (self.grad_thresh/normWhh)
+        normBhh = (self.gradBhh**2).sum().sqrt()
+        if normBhh > self.grad_thresh:
+            self.gradBhh *= (self.grad_thresh/normBhh)
+
+        normWxh = (self.gradWxh**2).sum().sqrt()
+        if normWxh > self.grad_thresh:
+            self.gradWxh *= (self.grad_thresh/normWxh)
+
+        normWhy = (self.gradWhy**2).sum().sqrt()
+        if normWhy > self.grad_thresh:
+            self.gradWhy *= (self.grad_thresh/normWhy)
+        normBhy = (self.gradBhy**2).sum().sqrt()
+        if normBhy > self.grad_thresh:
+            self.gradBhy *= (self.grad_thresh/normBhy)
 
     def gradientStep(self, lr, momentum):
         self.stepWhh = momentum*self.stepWhh + lr*self.gradWhh

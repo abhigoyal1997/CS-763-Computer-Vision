@@ -45,6 +45,9 @@ def run_epoch(mode, model, criterion, optimizer, batches, epoch, writer=None, lo
             model.clearGradParam()  # Clear Grad
             gradient = criterion.backward(logits, y)
             model.backward(x, gradient)
+            # Gradients check
+            # gradNorms = model.getGradientNorms()
+            # print("Model Gradient Norms:", gradNorms)
             # Weights update
             optimizer.updateStep()
 

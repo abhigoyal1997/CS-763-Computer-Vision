@@ -1,0 +1,12 @@
+1
+rnn 149 256 1
+./model8/Whh.bin
+./model8/Whh.bin
+./model8/Wxh.bin
+./model8/Wxh.bin
+./model8/Why.bin
+./model8/Why.bin
+./model8/Bhh.bin
+./model8/Bhh.bin
+./model8/Bhy.bin
+./model8/Bhy.bin
