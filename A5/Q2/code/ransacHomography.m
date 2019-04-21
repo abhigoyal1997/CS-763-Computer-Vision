@@ -1,4 +1,4 @@
-function [ tx, ty, theta ] = ransacHomography( x1, x2, thresh )
+function [ H ] = ransacHomography( x1, x2, thresh )
     k = 2;
     n = size(x1,1);
     max_iter = 3000;
@@ -18,12 +18,6 @@ function [ tx, ty, theta ] = ransacHomography( x1, x2, thresh )
         end
     end
     
-    [size(x1,1); size(best_C,1)]
-        
-    H = alignpoints(x1(best_C,:), x2(best_C,:));    
-    
-    tx = H(1,end);
-    ty = H(2,end);
-    theta = real(acos(H(1,1)));
+    H = alignpoints(x1(best_C,:), x2(best_C,:));
 end
 

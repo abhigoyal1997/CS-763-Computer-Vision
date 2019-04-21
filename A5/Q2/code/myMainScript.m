@@ -12,41 +12,35 @@ s=vid.frames;
 %% Your code here
 
 T = size(s,2);
-Tx = zeros(T-1,1);
-Ty = zeros(T-1,1);
-Theta = zeros(T-1,1);
+
+H = zeros(T-1,3,3);
 thres = 1;
 for i=1:T-1
-    i
     [p1, p2] = featureMatch(s,i);
-     [Tx(i), Ty(i), Theta(i)] = ransacHomography(p1,p2,thres);
+    H(i,:,:) = ransacHomography(p1,p2,thres);
 end
+
+H = cumprod(H,1);
+tx = H(:,1,end);
+ty = H(:,2,end);
+theta = real(acos(H(:,1,1)));
 
 %% Mean filter
 windowSize = 5; 
 b = (1/windowSize)*ones(1,windowSize);
 a = 1;
 
-Tx = cumsum(Tx);
-Ty = cumsum(Ty);
-Theta = cumsum(Theta);
-
-Mtx = filter(b,a,Tx);
-Mty = filter(b,a,Ty);
-Mtheta = filter(b,a,Theta);
+mtx = filter(b,a,tx);
+mty = filter(b,a,ty);
+mtheta = filter(b,a,theta);
 
 %% Smoothen video frames
-txfinal = Tx - Mtx;
-tyfinal = Ty- Mty;
-thetafinal = Theta - Mtheta;
-
-% txfinal = Tx - Mtx;
-% tyfinal = Ty- Mty;
-% thetafinal = Theta - Mtheta;
+txfinal = tx - mtx;
+tyfinal = ty- mty;
+thetafinal = theta - mtheta;
 
 outV = s(1);
 for i=2:T
-    i
     F = s(i);
     F_i = alignFrame(F.cdata,txfinal(i-1),tyfinal(i-1),thetafinal(i-1));
     outV(i) = struct('cdata',uint8(F_i),'colormap',[]);
