@@ -17,7 +17,6 @@ function [ H ] = ransacHomography( x1, x2, thresh )
             best_C = C;
         end
     end
-    
     H = alignpoints(x1(best_C,:), x2(best_C,:));
 end
 

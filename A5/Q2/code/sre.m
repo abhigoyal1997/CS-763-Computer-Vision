@@ -1,4 +1,4 @@
-function err = sre(H,p1,p2)
+function err = sre(H,p2,p1)
     n = size(p1,1);
     X1 = [p1';ones(1,n)];
     X_h = H*X1;

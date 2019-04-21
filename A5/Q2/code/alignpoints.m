@@ -1,8 +1,6 @@
 function [ H ] = alignpoints( p1, p2 )
-    
     c1 = mean(p1,1);
     c2 = mean(p2,1);
-    
 
     p1 = p1 - c1;
     p2 = p2 - c2;
@@ -16,7 +14,6 @@ function [ H ] = alignpoints( p1, p2 )
 
     end
     
-    theta = acos(R(1,1));
     cdiff = c1'-R*c2';
     
     H = [R cdiff; 0 0 1];
